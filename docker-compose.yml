@@ -43,3 +43,16 @@ services:
       - PGID=${PGID}
       - HTTPVAL=true
       - TZ=${TZ}
+  mariadb:
+    container_name: mariadb
+    image: linuxserver/mariadb
+    restart: unless-stopped
+    volumes:
+      - /storage/docker/mariadb:/config:rw
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
