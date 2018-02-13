@@ -1,0 +1,45 @@
+version: '3'
+services:
+  crashplan:
+    container_name: crashplan
+    image: jlesage/crashplan-pro
+    restart: unless-stopped
+    volumes:
+      - /storage/docker/crashplan:/config:rw
+      - /storage/nextcloud:/nextcloud:ro
+      - /storage/mne:/mne:ro
+      - /storage/media:/media:ro
+      - /storage/backup:/backup:ro
+      - /storage/downloads/crashplan:/downloads:rw
+    ports:
+      - "7810:5800"
+      - "7910:5900"
+    environment:
+      - USER_ID=${PUID}
+      - GROUP_ID=${PGID}
+      - UMASK=000
+      - TZ=${TZ}
+      - KEEP_APP_RUNNING=1
+      - CRASHPLAN_SRV_MAX_MEM=8192M
+  letsencrypt:
+    container_name: letsencrypt
+    image: linuxserver/letsencrypt
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - /storage/docker/letsencrypt:/config:rw
+    ports:
+      - "801:80"
+      - "4431:443"
+    environment:
+      - EMAIL=${EMAIL}
+      - URL=${URL}
+      - SUBDOMAINS=www,nextcloud
+      - ONLY_SUBDOMAINS=false
+      - DHLEVEL=4096
+      - VALIDATION=http
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - HTTPVAL=true
+      - TZ=${TZ}
