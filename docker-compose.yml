@@ -5,12 +5,11 @@ services:
     image: jlesage/crashplan-pro
     restart: unless-stopped
     volumes:
-      - /storage/docker/crashplan:/config:rw
+      - /storage/docker/crashplan:/config
       - /storage/nextcloud:/nextcloud:ro
       - /storage/mne:/mne:ro
       - /storage/media:/media:ro
-      - /storage/backup:/backup:ro
-      - /storage/downloads/crashplan:/downloads:rw
+      - /storage/downloads/crashplan:/downloads
     ports:
       - "7810:5800"
       - "7910:5900"
@@ -53,6 +52,90 @@ services:
       - "3306:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+  nextcloud:
+    container_name: nextcloud
+    image: linuxserver/nextcloud
+    restart: unless-stopped
+    volumes:
+      - /storage/docker/nextcloud:/config:rw
+      - /storage/nextcloud:/data:rw
+    ports:
+      - "444:443"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+  plex:
+    container_name: plex
+    image: plexinc/pms-docker:plexpass
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /storage/docker/plex:/config
+      - /storage/media:/media:ro
+      - /tmp:/transcode
+    environment:
+      - PLEX_CLAIM=CLAIM-UALQOZQNHA7ZSZY8PQ2A
+      - PLEX_UID=${PUID}
+      - PLEX_GID=${PGID}
+      - TZ=${TZ}
+  plexpy:
+    container_name: plexpy
+    image: linuxserver/plexpy
+    restart: unless-stopped
+    volumes:
+      - /storage/docker/plexpy:/config
+      - /storage/docker/plex/Library/Application Support/Plex Media Server/Logs:/logs:ro
+    ports:
+      - "8181:8181"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+  radarr:
+    container_name: radarr
+    image: linuxserver/radarr
+    restart: unless-stopped
+    volumes:
+      - /storage/docker/radarr:/config
+      - /storage/media:/media
+      - /storage/downloads:/downloads
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "7878:7878"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+  sabnzbd:
+    container_name: sabnzbd
+    image: linuxserver/sabnzbd
+    restart: unless-stopped
+    volumes:
+      - /storage/docker/sabnzbd:/config
+      - /storage/downloads:/downloads
+    ports:
+      - "8080:8080"
+      - "9090:9090"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+  sonarr:
+    container_name: sonarr
+    image: linuxserver/sonarr
+    restart: unless-stopped
+    volumes:
+      - /storage/docker/sonarr:/config
+      - /storage/media:/media
+      - /storage/downloads:/downloads
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "8989:8989"
+    environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
