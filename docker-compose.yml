@@ -1,15 +1,45 @@
 version: '2'
+
 services:
+
+  traefik:
+    container_name: traefik
+    image: traefik
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${CONFIG}/traefik/acme.json:/acme.json
+      - ${CONFIG}/traefik/traefik.toml:/etc/traefik/traefik.toml
+    ports:
+      - "801:80"
+      - "4431:443"
+    labels:
+      - traefik.enable=true
+      - traefik.frontend.rule=Host:monitor.${DOMAIN}
+      - traefik.frontend.auth.basic=${BASIC_AUTH}
+      - traefik.port=8080
+      - com.centurylinklabs.watchtower.enable=true
+
+  watchtower:
+    container_name: watchtower
+    image: v2tec/watchtower
+    restart: unless-stopped
+    command: --cleanup --label-enable --schedule="0 2 * * *"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+
   crashplan:
     container_name: crashplan
     image: jlesage/crashplan-pro
     restart: unless-stopped
     volumes:
-      - /storage/docker/crashplan:/config
-      - /storage/nextcloud:/nextcloud:ro
-      - /storage/mne:/mne:ro
-      - /storage/media:/media:ro
-      - /storage/downloads/crashplan:/downloads
+      - ${CONFIG}/crashplan:/config
+      - ${BASE}/nextcloud:/nextcloud:ro
+      - ${BASE}/mne:/mne:ro
+      - ${MEDIA}:/media:ro
+      - ${DOWNLOADS}/crashplan:/downloads
     ports:
       - "7810:5800"
       - "7910:5900"
@@ -20,34 +50,19 @@ services:
       - TZ=${TZ}
       - KEEP_APP_RUNNING=1
       - CRASHPLAN_SRV_MAX_MEM=8192M
-  letsencrypt:
-    container_name: letsencrypt
-    image: linuxserver/letsencrypt
-    restart: unless-stopped
-    cap_add:
-      - NET_ADMIN
-    volumes:
-      - /storage/docker/letsencrypt:/config:rw
-    ports:
-      - "801:80"
-      - "4431:443"
-    environment:
-      - EMAIL=${EMAIL}
-      - URL=${URL}
-      - SUBDOMAINS=www,nextcloud
-      - ONLY_SUBDOMAINS=false
-      - DHLEVEL=4096
-      - VALIDATION=http
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - HTTPVAL=true
-      - TZ=${TZ}
+    labels:
+      - traefik.enable=true
+      - traefik.port=5800
+      - traefik.frontend.rule=Host:crashplan.${DOMAIN}
+      - traefik.frontend.auth.basic=${BASIC_AUTH}
+      - com.centurylinklabs.watchtower.enable=true
+
   mariadb:
     container_name: mariadb
     image: linuxserver/mariadb
     restart: unless-stopped
     volumes:
-      - /storage/docker/mariadb:/config:rw
+      - ${CONFIG}/mariadb:/config:rw
     ports:
       - "3306:3306"
     environment:
@@ -55,54 +70,75 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+    labels:
+      - traefik.enable=false
+      - com.centurylinklabs.watchtower.enable=true
+
   nextcloud:
     container_name: nextcloud
     image: linuxserver/nextcloud
     restart: unless-stopped
     volumes:
-      - /storage/docker/nextcloud:/config:rw
-      - /storage/nextcloud:/data:rw
+      - ${CONFIG}/nextcloud:/config:rw
+      - ${BASE}/nextcloud:/data:rw
     ports:
       - "444:443"
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+    labels:
+      - traefik.enable=true
+      - traefik.port=443
+      - traefik.frontend.rule=Host:nextcloud.${DOMAIN}
+      - traefik.protocol=https
+      - com.centurylinklabs.watchtower.enable=true
+
   plex:
     container_name: plex
     image: plexinc/pms-docker:plexpass
     restart: unless-stopped
     network_mode: host
     volumes:
-      - /storage/docker/plex:/config
-      - /storage/media:/media:ro
+      - ${CONFIG}/plex:/config
+      - ${MEDIA}:/media:ro
       - /tmp:/transcode
     environment:
       - PLEX_CLAIM=CLAIM-UALQOZQNHA7ZSZY8PQ2A
       - PLEX_UID=${PUID}
       - PLEX_GID=${PGID}
       - TZ=${TZ}
+    labels:
+      - traefik.enable=false
+      - com.centurylinklabs.watchtower.enable=true
+
   plexpy:
     container_name: plexpy
     image: linuxserver/plexpy
     restart: unless-stopped
     volumes:
-      - /storage/docker/plexpy:/config
-      - /storage/docker/plex/Library/Application Support/Plex Media Server/Logs:/logs:ro
+      - ${CONFIG}/plexpy:/config
+      - ${CONFIG}/plex/Library/Application Support/Plex Media Server/Logs:/logs:ro
     ports:
       - "8181:8181"
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+    labels:
+      - traefik.enable=true
+      - traefik.port=8181
+      - traefik.frontend.rule=Host:plexpy.${DOMAIN}
+      - com.centurylinklabs.watchtower.enable=true
+
   radarr:
     container_name: radarr
     image: linuxserver/radarr
     restart: unless-stopped
     volumes:
-      - /storage/docker/radarr:/config
-      - /storage/media:/media
-      - /storage/downloads:/downloads
+      - ${CONFIG}/radarr:/config
+      - ${MEDIA}:/media
+      - ${DOWNLOADS}:/downloads
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "7878:7878"
@@ -110,28 +146,41 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+    labels:
+      - traefik.enable=true
+      - traefik.port=7878
+      - traefik.frontend.rule=Host:radarr.${DOMAIN}
+      - traefik.frontend.auth.basic=${BASIC_AUTH}
+      - com.centurylinklabs.watchtower.enable=true
+
   sabnzbd:
     container_name: sabnzbd
     image: linuxserver/sabnzbd
     restart: unless-stopped
     volumes:
-      - /storage/docker/sabnzbd:/config
-      - /storage/downloads:/downloads
+      - ${CONFIG}/sabnzbd:/config
+      - ${DOWNLOADS}:/downloads
     ports:
       - "8080:8080"
-      - "9090:9090"
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+    labels:
+      - traefik.enable=true
+      - traefik.port=8080
+      - traefik.frontend.rule=Host:sabnzbd.${DOMAIN}
+      - traefik.frontend.auth.basic=${BASIC_AUTH}
+      - com.centurylinklabs.watchtower.enable=true
+
   sonarr:
     container_name: sonarr
     image: linuxserver/sonarr
     restart: unless-stopped
     volumes:
-      - /storage/docker/sonarr:/config
-      - /storage/media:/media
-      - /storage/downloads:/downloads
+      - ${CONFIG}/sonarr:/config
+      - ${MEDIA}:/media
+      - ${DOWNLOADS}:/downloads
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "8989:8989"
@@ -139,3 +188,9 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+    labels:
+      - traefik.enable=true
+      - traefik.port=8989
+      - traefik.frontend.rule=Host:sonarr.${DOMAIN}
+      - traefik.frontend.auth.basic=${BASIC_AUTH}
+      - com.centurylinklabs.watchtower.enable=true
