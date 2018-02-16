@@ -104,14 +104,17 @@ services:
       - ${MEDIA}:/media:ro
       - /tmp:/transcode
     environment:
+      - ADVERTISE_IP="https://plex.${DOMAIN}:443/"
       - PLEX_CLAIM=CLAIM-UALQOZQNHA7ZSZY8PQ2A
       - PLEX_UID=${PUID}
       - PLEX_GID=${PGID}
       - TZ=${TZ}
     labels:
-      - traefik.enable=false
+      - traefik.enable=true
+      - traefik.port=32400
+      - traefik.frontend.rule=Host:plex.${DOMAIN}
       - com.centurylinklabs.watchtower.enable=true
-
+      
   plexpy:
     container_name: plexpy
     image: linuxserver/plexpy
