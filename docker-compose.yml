@@ -2,34 +2,6 @@ version: '2'
 
 services:
 
-  traefik:
-    container_name: traefik
-    image: traefik
-    restart: unless-stopped
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${CONFIG}/traefik/acme.json:/acme.json
-      - ${CONFIG}/traefik/traefik.toml:/etc/traefik/traefik.toml
-    ports:
-      - "801:80"
-      - "4431:443"
-    labels:
-      - traefik.enable=true
-      - traefik.frontend.rule=Host:monitor.${DOMAIN}
-      - traefik.frontend.auth.basic=${BASIC_AUTH}
-      - traefik.port=8080
-      - com.centurylinklabs.watchtower.enable=true
-
-  watchtower:
-    container_name: watchtower
-    image: v2tec/watchtower
-    restart: unless-stopped
-    command: --cleanup --label-enable --schedule="0 2 * * *"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    labels:
-      - com.centurylinklabs.watchtower.enable=true
-
   crashplan:
     container_name: crashplan
     image: jlesage/crashplan-pro
@@ -195,4 +167,32 @@ services:
       - traefik.port=8989
       - traefik.frontend.rule=Host:sonarr.${DOMAIN}
       - traefik.frontend.auth.basic=${BASIC_AUTH}
+      - com.centurylinklabs.watchtower.enable=true
+      
+  traefik:
+    container_name: traefik
+    image: traefik
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${CONFIG}/traefik/acme.json:/acme.json
+      - ${CONFIG}/traefik/traefik.toml:/etc/traefik/traefik.toml
+    ports:
+      - "801:80"
+      - "4431:443"
+    labels:
+      - traefik.enable=true
+      - traefik.frontend.rule=Host:monitor.${DOMAIN}
+      - traefik.frontend.auth.basic=${BASIC_AUTH}
+      - traefik.port=8080
+      - com.centurylinklabs.watchtower.enable=true
+
+  watchtower:
+    container_name: watchtower
+    image: v2tec/watchtower
+    restart: unless-stopped
+    command: --cleanup --label-enable --schedule="0 2 * * *"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
       - com.centurylinklabs.watchtower.enable=true
