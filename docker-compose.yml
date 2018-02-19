@@ -173,6 +173,7 @@ services:
     container_name: traefik
     image: traefik
     restart: unless-stopped
+    command: --web
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${CONFIG}/traefik/acme.json:/acme.json
