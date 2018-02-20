@@ -12,6 +12,9 @@ services:
       - ${BASE}/mne:/mne:ro
       - ${MEDIA}:/media:ro
       - ${DOWNLOADS}/crashplan:/downloads
+      - ${BASE}/backup:/backup:ro
+      - ${BASE}/docker:/docker:ro
+      - ${BASE}/domains:/domains:ro
     ports:
       - "7810:5800"
       - "7910:5900"
