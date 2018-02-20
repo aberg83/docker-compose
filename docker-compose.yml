@@ -16,7 +16,7 @@ services:
       - ${BASE}/docker:/docker:ro
       - ${BASE}/domains:/domains:ro
       - ${BASE}/isos:/isos:ro
-      - ${BASE]/games:/games:ro
+      - ${BASE}/games:/games:ro
     ports:
       - "7810:5800"
       - "7910:5900"
