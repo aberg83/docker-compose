@@ -13,8 +13,8 @@ services:
       - ${MEDIA}:/media:ro
       - ${DOWNLOADS}/crashplan:/downloads
       - ${BASE}/backup:/backup:ro
-      - ${BASE}/docker:/docker:ro
-      - ${BASE}/domains:/domains:ro
+      - ${APPS}/docker:/docker:ro
+      - ${APPS}/domains:/domains:ro
       - ${BASE}/isos:/isos:ro
       - ${BASE}/games:/games:ro
     ports:
