@@ -17,6 +17,7 @@ services:
       - ${APPS}/domains:/domains:ro
       - ${BASE}/isos:/isos:ro
       - ${BASE}/games:/games:ro
+      - ${BASE}/scripts:/scripts:ro
     ports:
       - "7810:5800"
       - "7910:5900"
