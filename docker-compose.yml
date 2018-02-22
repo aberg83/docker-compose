@@ -71,6 +71,24 @@ services:
       - traefik.frontend.rule=Host:nextcloud.${DOMAIN}
       - traefik.protocol=https
       - com.centurylinklabs.watchtower.enable=true
+      
+  ombi:
+    container_name: ombi
+    image: lsiodev/ombi-preview
+    restart: unless-stopped
+    volumes:
+      - ${CONFIG}/ombi:/config
+    ports:
+      - "3579:3579"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    labels:
+      - traefik.enable=true
+      - traefik.port=3579
+      - traefik.frontend.rule=Host:ombi.${DOMAIN}
+      - com.centurylinklabs.watchtower.enable=true
 
   plex:
     container_name: plex
