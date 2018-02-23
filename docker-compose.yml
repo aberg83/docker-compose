@@ -167,7 +167,7 @@ services:
       - ${CONFIG}/sabnzbd:/config
       - ${DOWNLOADS}:/downloads
     ports:
-      - "8080:8080"
+      - "8484:8080"
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -218,6 +218,31 @@ services:
       - traefik.frontend.rule=Host:monitor.${DOMAIN}
       - traefik.frontend.auth.basic=${BASIC_AUTH}
       - traefik.port=8080
+      - com.centurylinklabs.watchtower.enable=true
+  
+  unifi:
+    container_name: unifi
+    image: linuxserver/unifi
+    restart: unless-stopped
+    volumes:
+      - ${CONFIG}/unifi:/config
+    ports:
+      - "3478:3478/udp"
+      - "10001:10001/udp"
+      - "8080:8080"
+      - "8081:8081"
+      - "8443:8443"
+      - "8843:8843"
+      - "8880:8880"
+      - "6789:6789"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+    labels:
+      - traefik.enable=true
+      - traefik.port=8443
+      - traefik.frontend.rule=Host:unifi.${DOMAIN}
+      - traefik.protocol=https
       - com.centurylinklabs.watchtower.enable=true
 
   watchtower:
