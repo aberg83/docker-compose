@@ -14,7 +14,7 @@ services:
       - ${DOWNLOADS}/crashplan:/downloads
       - ${BASE}/backup:/backup:ro
       - ${APPS}/docker:/docker:ro
-      - ${APPS}/domains:/domains:ro
+      - /var/lib/libvirt/images:/domains:ro
       - ${BASE}/isos:/isos:ro
       - ${BASE}/games:/games:ro
       - ${BASE}/scripts:/scripts:ro
