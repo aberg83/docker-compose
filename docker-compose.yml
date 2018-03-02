@@ -44,15 +44,10 @@ services:
     volumes:
       - ${CONFIG}/glances:/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    ports:
-      - "61208-61209:61208-61209"
     environment:
       - GLANCES_OPT=-w
     labels:
-      - traefik.enable=true
-      - traefik.port=61208
-      - traefik.frontend.rule=Host:glances.${DOMAIN}
-      - traefik.frontend.auth.basic=${BASIC_AUTH}
+      - traefik.enable=false
       - com.centurylinklabs.watchtower.enable=true
 
   mariadb:
