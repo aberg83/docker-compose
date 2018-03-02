@@ -24,6 +24,7 @@ services:
       - TZ=${TZ}
       - KEEP_APP_RUNNING=1
       - CRASHPLAN_SRV_MAX_MEM=8192M
+      - APP_NICENESS=10
     labels:
       - traefik.enable=true
       - traefik.port=5800
