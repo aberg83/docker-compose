@@ -34,6 +34,19 @@ services:
       - traefik.frontend.rule=Host:crashplan.${DOMAIN}
       - traefik.frontend.auth.basic=${BASIC_AUTH}
       - com.centurylinklabs.watchtower.enable=true
+      
+  glances:
+    container_name: glances
+    image: docker.io/nicolargo/glances
+    restart: unless-stopped
+    pid: host
+    volumes:
+      - ${CONFIG}/glances:/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "61208-61209:61208-61209"
+    environment:
+      - GLANCES_OPT=-w
 
   mariadb:
     container_name: mariadb
