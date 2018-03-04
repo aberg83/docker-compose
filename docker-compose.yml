@@ -15,8 +15,8 @@ services:
       - ${BASE}/backup:/backup:ro
       - ${BASE}/scripts:/scripts:ro
     ports:
-      - "7810:5800"
-      - "7910:5900"
+      - 7810:5800
+      - 7910:5900
     environment:
       - USER_ID=${PUID}
       - GROUP_ID=${PGID}
@@ -45,7 +45,31 @@ services:
     labels:
       - traefik.enable=false
       - com.centurylinklabs.watchtower.enable=true
-
+     
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    restart: unless-stopped
+    volumes:
+      - ${CONFIG}/grafana:/var/lib/grafana
+    ports:
+      - 3000:3000
+    labels:
+      - traefik.enable=false
+      - com.centurylinklabs.watchtower.enable=true
+    
+  influxdb:
+    container_name: influxdb
+    image: influxdb
+    restart: unless-stopped
+    volumes:
+      - ${CONFIG}/influxdb:/var/lib/influxdb
+    ports:
+      - 8086:8086
+    labels:
+      - traefik.enable=false
+      - com.centurylinklabs.watchtower.enable=true
+      
   mariadb:
     container_name: mariadb
     image: linuxserver/mariadb
@@ -53,7 +77,7 @@ services:
     volumes:
       - ${CONFIG}/mariadb:/config
     ports:
-      - "3306:3306"
+      - 3306:3306
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - PUID=${PUID}
@@ -71,7 +95,7 @@ services:
       - ${CONFIG}/nextcloud:/config
       - ${BASE}/nextcloud:/data
     ports:
-      - "444:443"
+      - 444:443
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -126,7 +150,7 @@ services:
       - ${CONFIG}/plexpy:/config
       - ${CONFIG}/plex/Library/Application Support/Plex Media Server/Logs:/logs:ro
     ports:
-      - "8181:8181"
+      - 8181:8181
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -147,7 +171,7 @@ services:
       - ${DOWNLOADS}:/downloads
       - /etc/localtime:/etc/localtime:ro
     ports:
-      - "7878:7878"
+      - 7878:7878
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -167,7 +191,7 @@ services:
       - ${CONFIG}/sabnzbd:/config
       - ${DOWNLOADS}:/downloads
     ports:
-      - "8484:8080"
+      - 8484:8080
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -189,7 +213,7 @@ services:
       - ${DOWNLOADS}:/downloads
       - /etc/localtime:/etc/localtime:ro
     ports:
-      - "8989:8989"
+      - 8989:8989
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -211,8 +235,8 @@ services:
       - ${CONFIG}/traefik/acme.json:/acme.json
       - ${CONFIG}/traefik/traefik.toml:/etc/traefik/traefik.toml
     ports:
-      - "801:80"
-      - "4431:443"
+      - 801:80
+      - 4431:443
     labels:
       - traefik.enable=true
       - traefik.frontend.rule=Host:monitor.${DOMAIN}
@@ -227,14 +251,14 @@ services:
     volumes:
       - ${CONFIG}/unifi:/config
     ports:
-      - "3478:3478/udp"
-      - "10001:10001/udp"
-      - "8080:8080"
-      - "8081:8081"
-      - "8443:8443"
-      - "8843:8843"
-      - "8880:8880"
-      - "6789:6789"
+      - 3478:3478/udp
+      - 10001:10001/udp
+      - 8080:8080
+      - 8081:8081
+      - 8443:8443
+      - 8843:8843
+      - 8880:8880
+      - 6789:6789
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
