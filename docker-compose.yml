@@ -81,6 +81,26 @@ services:
     labels:
       - traefik.enable=false
       - com.centurylinklabs.watchtower.enable=true
+      
+  heimdall:
+    container_name: heimdall
+    image: linuxserver/heimdall
+    restart: unless-stopped
+    volumes:
+      - ${CONFIG}/heimdall:/config
+    ports:
+      - 802:80
+      - 4432:443
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    labels:
+      - traefik.enable=true
+      - traefik.port=443
+      - traefik.frontend.rule=Host:dashboard.${DOMAIN}
+      - traefik.protocol=https
+      - com.centurylinklabs.watchtower.enable=true
     
   influxdb:
     container_name: influxdb
