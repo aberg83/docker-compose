@@ -31,31 +31,7 @@ services:
       - traefik.frontend.rule=Host:crashplan.${DOMAIN}
       - traefik.frontend.auth.basic=${BASIC_AUTH}
       - com.centurylinklabs.watchtower.enable=true
-      
-  duplicati:
-    container_name: duplicati
-    image: linuxserver/duplicati
-    restart: unless-stopped
-    volumes:
-      - ${CONFIG}/duplicati:/config
-      - ${BASE}/nextcloud:/nextcloud:ro
-      - ${BASE}/mne:/mne:ro
-      - ${MEDIA}:/media:ro
-      - ${DOWNLOADS}/duplicati:/downloads
-      - ${BASE}/backup:/backup:ro
-      - ${BASE}/scripts:/scripts:ro
-    ports:
-      - 8200:8200
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-    labels:
-      - traefik.enable=true
-      - traefik.port=8200
-      - traefik.frontend.rule=Host:duplicati.${DOMAIN}
-      - traefik.frontend.auth.basic=${BASIC_AUTH}
-      - com.centurylinklabs.watchtower.enable=true
-      
+  
   glances:
     container_name: glances
     image: docker.io/nicolargo/glances
