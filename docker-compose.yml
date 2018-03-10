@@ -83,6 +83,24 @@ services:
       - traefik.protocol=https
       - com.centurylinklabs.watchtower.enable=true
       
+  ombi:
+    container_name: ombi
+    image: linuxserver/ombi
+    restart: unless-stopped
+    volumes:
+      - ${CONFIG}/ombi:/config
+    ports:
+      - 3579:3579
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    labels:
+      - traefik.enable=true
+      - traefik.port=3579
+      - traefik.frontend.rule=Host:ombi.${DOMAIN}
+      - com.centurylinklabs.watchtower.enable=true
+
   openvpn-as:
     container_name: openvpn-as
     image: linuxserver/openvpn-as
