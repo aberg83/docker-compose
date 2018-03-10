@@ -1,36 +1,6 @@
 version: '2'
 
 services:
-      
-  crashplan:
-    container_name: crashplan
-    image: jlesage/crashplan-pro
-    restart: unless-stopped
-    volumes:
-      - ${CONFIG}/crashplan:/config
-      - ${BASE}/nextcloud:/nextcloud:ro
-      - ${BASE}/mne:/mne:ro
-      - ${MEDIA}:/media:ro
-      - ${DOWNLOADS}/crashplan:/downloads
-      - ${BASE}/backup:/backup:ro
-      - ${BASE}/scripts:/scripts:ro
-    ports:
-      - 7810:5800
-      - 7910:5900
-    environment:
-      - USER_ID=${PUID}
-      - GROUP_ID=${PGID}
-      - UMASK=000
-      - TZ=${TZ}
-      - KEEP_APP_RUNNING=1
-      - CRASHPLAN_SRV_MAX_MEM=8192M
-      - APP_NICENESS=10
-    labels:
-      - traefik.enable=true
-      - traefik.port=5800
-      - traefik.frontend.rule=Host:crashplan.${DOMAIN}
-      - traefik.frontend.auth.basic=${BASIC_AUTH}
-      - com.centurylinklabs.watchtower.enable=true
   
   glances:
     container_name: glances
