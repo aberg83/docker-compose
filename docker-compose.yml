@@ -106,25 +106,6 @@ services:
       - traefik.enable=false
       - com.centurylinklabs.watchtower.enable=true
       
-  plexpy:
-    container_name: plexpy
-    image: linuxserver/plexpy
-    restart: unless-stopped
-    volumes:
-      - ${CONFIG}/plexpy:/config
-      - ${CONFIG}/plex/Library/Application Support/Plex Media Server/Logs:/logs:ro
-    ports:
-      - 8181:8181
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    labels:
-      - traefik.enable=true
-      - traefik.port=8181
-      - traefik.frontend.rule=Host:plexpy.${DOMAIN}
-      - com.centurylinklabs.watchtower.enable=true
-
   radarr:
     container_name: radarr
     image: linuxserver/radarr
@@ -187,6 +168,25 @@ services:
       - traefik.port=8989
       - traefik.frontend.rule=Host:sonarr.${DOMAIN}
       - traefik.frontend.auth.basic=${BASIC_AUTH}
+      - com.centurylinklabs.watchtower.enable=true
+      
+  tautulli:
+    container_name: tautulli
+    image: linuxserver/tautulli
+    restart: unless-stopped
+    volumes:
+      - ${CONFIG}/tautulli:/config
+      - ${CONFIG}/plex/Library/Application Support/Plex Media Server/Logs:/logs:ro
+    ports:
+      - 8181:8181
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    labels:
+      - traefik.enable=true
+      - traefik.port=8181
+      - traefik.frontend.rule=Host:tautulli.${DOMAIN}
       - com.centurylinklabs.watchtower.enable=true
       
   traefik:
