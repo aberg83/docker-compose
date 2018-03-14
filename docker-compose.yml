@@ -199,7 +199,7 @@ services:
       - PLAYLIST=http://streams.ultrabox.site:7000/get.php?username=nEeyJZ31337&password=n6rHg5uQ49&type=m3u_plus&output=ts
       - STREAMS=1
       - LISTEN=0.0.0.0:6077
-      - USEREGEX=Canada
+      - FILTERREGEX=Canada
       
   traefik:
     container_name: traefik
