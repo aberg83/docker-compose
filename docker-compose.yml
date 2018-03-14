@@ -196,7 +196,7 @@ services:
     ports:
       - 6077:6077
     environment:
-      - PLAYLIST=http://streams.ultrabox.site:7000/get.php?username=nEeyJZ31337&password=n6rHg5uQ49&type=m3u_plus&output=ts
+      - PLAYLIST=http://streams.ultrabox.site:7000/get.php?username=UBEB78AKE&password=RG22PCXEE7&type=m3u_plus&output=ts
       - STREAMS=1
       - LISTEN=0.0.0.0:6077
       - USEREGEX=.*CA.*.
