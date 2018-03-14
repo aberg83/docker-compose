@@ -189,6 +189,18 @@ services:
       - traefik.frontend.rule=Host:tautulli.${DOMAIN}
       - com.centurylinklabs.watchtower.enable=true
       
+  telly:
+    container_name: telly
+    image: tombowditch/telly
+    restart: unless-stopped
+    ports:
+      - 6077:6077
+    environment:
+      - PLAYLIST=http://streams.ultrabox.site:7000/get.php?username=nEeyJZ31337&password=n6rHg5uQ49&type=m3u_plus&output=ts
+      - STREAMS=1
+      - LISTEN=0.0.0.0:6077
+      - USEREGEX=Canada
+      
   traefik:
     container_name: traefik
     image: traefik
