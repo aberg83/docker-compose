@@ -196,7 +196,7 @@ services:
     ports:
       - 6077:6077
     environment:
-      - PLAYLIST=http://streams.ultrabox.site:7000/get.php?username=UBEB78AKE&password=RG22PCXEE7&type=m3u_plus&output=ts
+      - PLAYLIST=http://xtream-editor.com/en/get/m3u/7FDCF76E40A266096D4751A9243349CB
       - STREAMS=1
       - LISTEN=0.0.0.0:6077
       
