@@ -17,7 +17,6 @@ services:
       - TZ=${TZ}
     labels:
       - traefik.enable=false
-      - com.centurylinklabs.watchtower.enable=true
       
   nextcloud:
     container_name: nextcloud
@@ -37,7 +36,6 @@ services:
       - traefik.port=443
       - traefik.frontend.rule=Host:nextcloud.${DOMAIN}
       - traefik.protocol=https
-      - com.centurylinklabs.watchtower.enable=true
       
   ombi:
     container_name: ombi
@@ -55,7 +53,6 @@ services:
       - traefik.enable=true
       - traefik.port=3579
       - traefik.frontend.rule=Host:ombi.${DOMAIN}
-      - com.centurylinklabs.watchtower.enable=true
 
   openvpn-as:
     container_name: openvpn-as
@@ -72,7 +69,6 @@ services:
       - TZ=${TZ}
     labels:
       - traefik.enable=false
-      - com.centurylinklabs.watchtower.enable=true
 
   plex:
     container_name: plex
@@ -90,7 +86,6 @@ services:
       - TZ=${TZ}
     labels:
       - traefik.enable=false
-      - com.centurylinklabs.watchtower.enable=true
       
   radarr:
     container_name: radarr
@@ -112,7 +107,6 @@ services:
       - traefik.port=7878
       - traefik.frontend.rule=Host:radarr.${DOMAIN}
       - traefik.frontend.auth.basic=${BASIC_AUTH}
-      - com.centurylinklabs.watchtower.enable=true
 
   sabnzbd:
     container_name: sabnzbd
@@ -132,7 +126,6 @@ services:
       - traefik.port=8080
       - traefik.frontend.rule=Host:sabnzbd.${DOMAIN}
       - traefik.frontend.auth.basic=${BASIC_AUTH}
-      - com.centurylinklabs.watchtower.enable=true
 
   sonarr:
     container_name: sonarr
@@ -154,7 +147,6 @@ services:
       - traefik.port=8989
       - traefik.frontend.rule=Host:sonarr.${DOMAIN}
       - traefik.frontend.auth.basic=${BASIC_AUTH}
-      - com.centurylinklabs.watchtower.enable=true
       
   tautulli:
     container_name: tautulli
@@ -173,7 +165,6 @@ services:
       - traefik.enable=true
       - traefik.port=8181
       - traefik.frontend.rule=Host:tautulli.${DOMAIN}
-      - com.centurylinklabs.watchtower.enable=true
       
   telly:
     container_name: telly
@@ -187,6 +178,8 @@ services:
       - PLAYLIST=/config/playlist.m3u
       - STREAMS=1
       - LISTEN=0.0.0.0:6077
+    labels:
+      - traefik.enable=false
       
   traefik:
     container_name: traefik
@@ -205,7 +198,6 @@ services:
       - traefik.frontend.rule=Host:monitor.${DOMAIN}
       - traefik.frontend.auth.basic=${BASIC_AUTH}
       - traefik.port=8080
-      - com.centurylinklabs.watchtower.enable=true
   
   unifi:
     container_name: unifi
@@ -230,14 +222,14 @@ services:
       - traefik.port=8443
       - traefik.frontend.rule=Host:unifi.${DOMAIN}
       - traefik.protocol=https
-      - com.centurylinklabs.watchtower.enable=true
 
   watchtower:
     container_name: watchtower
     image: v2tec/watchtower
     restart: unless-stopped
-    command: --cleanup --label-enable --schedule="0 2 * * *"
+    command: --cleanup --schedule "20 11 * * *"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime:ro
     labels:
-      - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=false
