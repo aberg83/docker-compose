@@ -1,20 +1,6 @@
 version: '2'
 
 services:
-  
-  glances:
-    container_name: glances
-    image: docker.io/nicolargo/glances
-    restart: unless-stopped
-    pid: host
-    network_mode: host
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    environment:
-      - GLANCES_OPT=-w
-    labels:
-      - traefik.enable=false
-      - com.centurylinklabs.watchtower.enable=true
       
   mariadb:
     container_name: mariadb
