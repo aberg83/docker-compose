@@ -11,7 +11,7 @@ services:
     ports:
       - 3306:3306
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${PASSWORD}
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
@@ -84,9 +84,9 @@ services:
       - DNS2=8.8.4.4
       - IPv6=False
       - TZ=${TZ}
-      - INTERFACE=br0
+      - INTERFACE=${INTERFACE}
       - DNSMASQ_LISTENING=all
-      - WEBPASSWORD=${MYSQL_ROOT_PASSWORD}
+      - WEBPASSWORD=${PASSWORD}
       
   plex:
     container_name: plex
