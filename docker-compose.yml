@@ -70,28 +70,6 @@ services:
     labels:
       - traefik.enable=false
       
-  pihole:
-    container_name: pihole
-    image: diginc/pi-hole
-    restart: unless-stopped
-    network_mode: host
-    volumes:
-      - ${CONFIG}/pihole/pihole:/etc/pihole
-      - ${CONFIG}/pihole/dnsmasq.d:/etc/dnsmasq.d
-    ports:
-      - 53:53/tcp
-      - 53:53/udp
-      - 802:80/tcp
-    environment:
-      - ServerIP=${SERVER_IP}
-      - DNS1=8.8.8.8
-      - DNS2=8.8.4.4
-      - IPv6=False
-      - TZ=${TZ}
-      - INTERFACE=${INTERFACE}
-      - DNSMASQ_LISTENING=all
-      - WEBPASSWORD=${PASSWORD}
-      
   plex:
     container_name: plex
     image: plexinc/pms-docker:plexpass
