@@ -166,21 +166,6 @@ services:
       - traefik.port=8181
       - traefik.frontend.rule=Host:tautulli.${DOMAIN}
       
-  telly:
-    container_name: telly
-    image: tombowditch/telly
-    restart: unless-stopped
-    volumes:
-      - ${CONFIG}/telly:/config
-    ports:
-      - 6077:6077
-    environment:
-      - PLAYLIST=/config/playlist.m3u
-      - STREAMS=1
-      - LISTEN=0.0.0.0:6077
-    labels:
-      - traefik.enable=false
-      
   traefik:
     container_name: traefik
     image: traefik
