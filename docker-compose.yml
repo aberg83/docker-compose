@@ -1,152 +1,163 @@
 version: '2'
 
 services:
-      
-  mariadb:
-    container_name: mariadb
-    image: linuxserver/mariadb
-    restart: unless-stopped
+
+  deepstack:
+    image: deepquestai/deepstack:noavx
+    container_name: deepstack
     volumes:
-      - ${CONFIG}/mariadb:/config
+      - ${APPDATA}/deepstack:/datastore
+    environment:
+      - VISION-DETECTION=True
+      - API-KEY=${DEEPSTACK_API_KEY}
+    ports:
+      - 5000:5000
+    restart: unless-stopped
+  
+  esphome:
+    image: esphome/esphome
+    container_name: esphome
+    volumes:
+      - ${APPDATA}/esphome:/config
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - ESPHOME_DASHBOARD_USE_PING=true
+    ports:
+      - 6052:6052
+    restart: unless-stopped
+  
+  homeassistant:
+    image: homeassistant/home-assistant
+    container_name: homeassistant
+    volumes:
+      - ${APPDATA}/homeassistant:/config
+      - /etc/localtime:/etc/localtime:ro
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+      - /dev/ttyUSB1:/dev/ttyUSB1
+    network_mode: host
+    restart: unless-stopped
+    privileged: true
+  
+  mariadb:
+    image: linuxserver/mariadb
+    container_name: mariadb
+    volumes:
+      - ${APPDATA}/mariadb:/config
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - TZ=America/Toronto
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     ports:
       - 3306:3306
+    restart: unless-stopped
+  
+  mosquitto:
+    container_name: mosquitto
+    image: eclipse-mosquitto
+    restart: unless-stopped
+    privileged: true
+    volumes:
+      - ${APPDATA}/mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ${APPDATA}/mosquitto/log:/mosquitto/log
+      - ${APPDATA}/mosquitto/data:/mosquitto/data
+      - /etc/localtime:/etc/localtime:ro
     environment:
-      - MYSQL_ROOT_PASSWORD=${PASSWORD}
       - PUID=${PUID}
       - PGID=${PGID}
-      - TZ=${TZ}
-    labels:
-      - traefik.enable=false
-      
-  nextcloud:
-    container_name: nextcloud
-    image: linuxserver/nextcloud
-    restart: unless-stopped
-    volumes:
-      - ${CONFIG}/nextcloud:/config
-      - ${BASE}/nextcloud:/data
+      - TZ=America/Toronto
     ports:
-      - 444:443
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    labels:
-      - traefik.enable=true
-      - traefik.port=443
-      - traefik.frontend.rule=Host:nextcloud.${DOMAIN}
-      - traefik.protocol=https
-      
-  plex:
-    container_name: plex
-    image: plexinc/pms-docker:plexpass
-    restart: unless-stopped
-    network_mode: host
+      - 1883:1883/tcp
+      - 9001:9001/tcp
+  
+  nodered:
+    image: nodered/node-red
+    container_name: nodered
     volumes:
-      - ${CONFIG}/plex:/config
-      - ${MEDIA}:/media:ro
+      - ${APPDATA}/nodered:/data
+    environment:
+      - TZ=America/Toronto
+    restart: unless-stopped
+    user: root
+    ports:
+      - "1880:1880"
+  
+  plex:
+    image: plexinc/pms-docker:plexpass
+    container_name: plex
+    volumes:
+      - ${APPDATA}/plex:/config
+      - ${MNT}/media:/media
+      - ${MNT}/music:/music
+      - ${MNT}/videos:/videos
       - /tmp:/transcode
     environment:
-      - PLEX_CLAIM=${PLEX_CLAIM}
-      - PLEX_UID=${PUID}
+      - PLEX_CLAIM=claim-gzzxP9dGJ6Qmy_PmaxmA
       - PLEX_GID=${PGID}
-      - TZ=${TZ}
-    labels:
-      - traefik.enable=false
-      
+      - PLEX_UID=${PUID}
+      - TZ=America/Toronto
+      - VERSION=latest
+    devices:
+      - /dev/dri:/dev/dri
+    privileged: true
+    restart: unless-stopped
+    network_mode: host
+  
   radarr:
     container_name: radarr
     image: linuxserver/radarr
     restart: unless-stopped
     volumes:
-      - ${CONFIG}/radarr:/config
-      - ${MEDIA}:/media
-      - ${DOWNLOADS}:/downloads
+      - ${APPDATA}/radarr:/config
+      - ${MNT}/media:/media
+      - ${MNT}/downloads:/downloads
       - /etc/localtime:/etc/localtime:ro
-    ports:
-      - 7878:7878
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - TZ=${TZ}
-    labels:
-      - traefik.enable=true
-      - traefik.port=7878
-      - traefik.frontend.rule=Host:radarr.${DOMAIN}
-      - traefik.frontend.auth.basic=${BASIC_AUTH}
-
+      - TZ=America/Toronto
+    ports:
+      - 7878:7878/tcp
+  
   sabnzbd:
     container_name: sabnzbd
     image: linuxserver/sabnzbd
     restart: unless-stopped
     volumes:
-      - ${CONFIG}/sabnzbd:/config
-      - ${DOWNLOADS}:/downloads
-    ports:
-      - 8484:8080
+      - ${APPDATA}/sabnzbd:/config
+      - ${MNT}/downloads:/downloads
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - TZ=${TZ}
-    labels:
-      - traefik.enable=true
-      - traefik.port=8080
-      - traefik.frontend.rule=Host:sabnzbd.${DOMAIN}
-      - traefik.frontend.auth.basic=${BASIC_AUTH}
-
+      - TZ=America/Toronto
+    ports:
+      - 8084:8080/tcp
+  
   sonarr:
     container_name: sonarr
     image: linuxserver/sonarr
     restart: unless-stopped
     volumes:
-      - ${CONFIG}/sonarr:/config
-      - ${MEDIA}:/media
-      - ${DOWNLOADS}:/downloads
+      - ${APPDATA}/sonarr:/config
+      - ${MNT}/media:/media
+      - ${MNT}/downloads:/downloads
       - /etc/localtime:/etc/localtime:ro
-    ports:
-      - 8989:8989
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - TZ=${TZ}
-    labels:
-      - traefik.enable=true
-      - traefik.port=8989
-      - traefik.frontend.rule=Host:sonarr.${DOMAIN}
-      - traefik.frontend.auth.basic=${BASIC_AUTH}
-      
-  tautulli:
-    container_name: tautulli
-    image: linuxserver/tautulli
-    restart: unless-stopped
-    volumes:
-      - ${CONFIG}/tautulli:/config
-      - ${CONFIG}/plex/Library/Application Support/Plex Media Server/Logs:/logs:ro
+      - TZ=America/Toronto
     ports:
-      - 8181:8181
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    labels:
-      - traefik.enable=true
-      - traefik.port=8181
-      - traefik.frontend.rule=Host:tautulli.${DOMAIN}
-      
-  traefik:
-    container_name: traefik
-    image: traefik
+      - 8989:8989/tcp
+  
+  watchtower:
+    container_name: watchtower
+    image: v2tec/watchtower
     restart: unless-stopped
-    command: --web
+    command: --schedule "0 0 23 * * SUN" --cleanup
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${CONFIG}/traefik/acme.json:/acme.json
-      - ${CONFIG}/traefik/traefik.toml:/etc/traefik/traefik.toml
-    ports:
-      - 801:80
-      - 4431:443
-    labels:
-      - traefik.enable=true
-      - traefik.frontend.rule=Host:monitor.${DOMAIN}
-      - traefik.frontend.auth.basic=${BASIC_AUTH}
-      - traefik.port=8080
+      - ${APPDATA}/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime:ro
